@@ -1,0 +1,58 @@
+version: "3"
+
+tasks:
+  default:
+    desc: "Run default task"
+    cmds:
+      - task: "install"
+      - task: "format"
+      - task: "lint"
+      - task: "build"
+
+  install:
+    desc: "Install dependencies"
+    sources:
+      - package.json
+      - package-lock.json
+    cmds:
+      - pnpm i
+
+  format:
+    desc: "Format code"
+    deps:
+      - install
+    cmds:
+      - pnpm run format
+
+  lint:
+    desc: "Lint code"
+    deps:
+      - install
+    cmds:
+      - pnpm run lint
+
+  lint:fix:
+    desc: "Lint code and fix issues"
+    deps:
+      - install
+    cmds:
+      - pnpm run lint:fix
+
+  build:
+    desc: "Build project"
+    deps:
+      - install
+    cmds:
+      - pnpm run build
+
+  clean:
+    desc: "Clean build artifacts"
+    cmds:
+      - rm -rf dist
+
+  dev:
+    desc: "Run development server"
+    deps:
+      - install
+    cmds:
+      - pnpm run dev

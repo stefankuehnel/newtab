@@ -1,0 +1,52 @@
+name: "GitHub Pages"
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: "read"
+  pages: "write"
+  id-token: "write"
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: "deploy"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "GitHub: Checkout Repository"
+        uses: "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683" # v4.2.2
+
+      - name: "GitHub: Setup Pages"
+        uses: "actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b" # v5.0.0
+
+      - name: "GitHub: Setup Nix"
+        uses: "custom-workflows/setup-nix@d3dc49dd7bd37d10de81c938bebefad918e4d499" # latest
+        with:
+          install_url: "https://releases.nixos.org/nix/nix-2.29.0/install"
+          extra_nix_config: |
+            extra-experimental-features = nix-command flakes
+
+      - name: "Task: Run"
+        shell: "bash"
+        run: |
+          nix shell --inputs-from . --command "task"
+
+      - name: "GitHub: Upload Artifact for GitHub Pages"
+        uses: "actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b2" # v4.0.0
+        with:
+          path: "./dist"
+
+      - name: "GitHub: Deploy to GitHub Pages"
+        id: "deployment"
+        uses: "actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e4" # v4.0.5
