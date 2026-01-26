@@ -63,7 +63,10 @@ export const BookmarkDialog: React.FC<BookmarkDialogProps> = ({
     defaultValues: formDefaultValues,
     onSubmit: async ({ value }) => {
       if (type === "create") {
-        createBookmark(value);
+        createBookmark({
+          ...value,
+          id: crypto.randomUUID(),
+        });
 
         toast.success("Success", {
           description: "Bookmark created successfully.",
