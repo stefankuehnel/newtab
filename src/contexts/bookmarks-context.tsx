@@ -13,7 +13,7 @@ export type BookmarksContextState = {
   createBookmark: (bookmark: Bookmark) => Bookmark;
   deleteBookmark: (id: UUID) => boolean;
   readBookmark: (id: UUID) => Bookmark | undefined;
-  setBookmarks: (bookmarks: Bookmarks) => void;
+  setBookmarks: React.Dispatch<React.SetStateAction<Bookmarks>>;
   updateBookmark: (id: UUID, bookmark: Bookmark) => Bookmark;
 };
 

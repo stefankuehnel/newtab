@@ -1,7 +1,13 @@
+import { move } from "@dnd-kit/helpers";
+import { DragDropProvider } from "@dnd-kit/react";
+import { useSortable } from "@dnd-kit/react/sortable";
 import { BookMarkedIcon, PlusIcon } from "lucide-react";
 import React from "react";
 
+import type { Bookmark as BookmarkProps } from "@/types";
+
 import { Bookmark } from "@/components/bookmark";
+import { BookmarkDialog } from "@/components/bookmark-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -14,10 +20,27 @@ import {
 import { ItemGroup } from "@/components/ui/item";
 import { useBookmarks } from "@/contexts/bookmarks-context";
 
-import { BookmarkDialog } from "./bookmark-dialog";
+type SortableProps = {
+  bookmark: BookmarkProps;
+  index: number;
+};
+
+const Sortable: React.FC<SortableProps> = ({ bookmark, index }) => {
+  const { ref } = useSortable({ id: bookmark.id, index });
+
+  return (
+    <Bookmark
+      icon={bookmark.icon}
+      id={bookmark.id}
+      ref={ref}
+      title={bookmark.title}
+      url={bookmark.url}
+    />
+  );
+};
 
 export const BookmarkList: React.FC = () => {
-  const { bookmarks } = useBookmarks();
+  const { bookmarks, setBookmarks } = useBookmarks();
 
   if (bookmarks.size === 0) {
     return (
@@ -56,18 +79,26 @@ export const BookmarkList: React.FC = () => {
         </BookmarkDialog>
       </div>
       <ItemGroup className="grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] lg:grid-cols-6 gap-4">
-        {bookmarks
-          .entries()
-          .toArray()
-          .map(([id, bookmark], index) => (
-            <Bookmark
-              icon={bookmark.icon}
-              id={id}
-              key={index}
-              title={bookmark.title}
-              url={bookmark.url}
-            />
-          ))}
+        <DragDropProvider
+          onDragEnd={(event) => {
+            setBookmarks(
+              (bookmarks) =>
+                new Map(
+                  move(bookmarks.values().toArray(), event).map((bookmark) => [
+                    bookmark.id,
+                    bookmark,
+                  ]),
+                ),
+            );
+          }}
+        >
+          {bookmarks
+            .entries()
+            .toArray()
+            .map(([id, bookmark], index) => (
+              <Sortable bookmark={bookmark} index={index} key={id} />
+            ))}
+        </DragDropProvider>
       </ItemGroup>
     </div>
   );

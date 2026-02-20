@@ -23,7 +23,9 @@ import { useBookmarks } from "@/contexts/bookmarks-context";
 
 import { BookmarkDialog } from "./bookmark-dialog";
 
-export const Bookmark: React.FC<BookmarkProps> = ({ icon, id, title, url }) => {
+export const Bookmark: React.FC<
+  BookmarkProps & React.ComponentProps<"div">
+> = ({ icon, id, ref, title, url }) => {
   const { deleteBookmark } = useBookmarks();
 
   const handleCopy = async () => {
@@ -58,6 +60,7 @@ export const Bookmark: React.FC<BookmarkProps> = ({ icon, id, title, url }) => {
         <Item
           asChild
           className="group relative w-full flex-col items-center justify-center"
+          ref={ref}
           role="listitem"
           variant="outline"
         >
