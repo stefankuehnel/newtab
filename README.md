@@ -11,7 +11,7 @@ A modern, customizable browser new tab page built by [Stefan Kühnel](https://st
 - **Bookmark Management**: Create, edit, and organize bookmarks with custom icons (favicon, letters, or custom images)
 - **Theme Support**: Dark, light, and system theme
 - **Keyboard Shortcuts**: Navigate efficiently with keyboard shortcuts (`Ctrl+K` for search, `Shift+S` for settings, `Shift+B` for bookmarks, etc.)
-- **Import/Export**: Backup and restore your configuration as JSON
+- **Import/Export**: Backup and restore your configuration as JSON, or share it via URL
 
 ## Get Started
 

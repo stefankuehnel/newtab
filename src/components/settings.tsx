@@ -5,6 +5,7 @@ import {
   MoonIcon,
   PaintbrushIcon,
   SettingsIcon,
+  Share2Icon,
   SunIcon,
   UploadIcon,
 } from "lucide-react";
@@ -62,7 +63,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { type Theme, useTheme } from "@/contexts/theme-context";
-import { useJSONConfig } from "@/hooks/use-config";
+import { useJSONConfig, useJSONConfigFromURL } from "@/hooks/use-config";
 import { download } from "@/lib/utils";
 
 export type Tab = {
@@ -120,6 +121,7 @@ const ConfigurationTab: React.FC = () => {
   const [isUploading, setIsUploading] = React.useState(false);
 
   const { jsonConfig, setJSONConfig } = useJSONConfig();
+  const { jsonConfigURL } = useJSONConfigFromURL();
 
   const onDownload = () => {
     download("tab-configuration.json", jsonConfig);
@@ -163,6 +165,36 @@ const ConfigurationTab: React.FC = () => {
     [setJSONConfig],
   );
 
+  const onShare = React.useCallback(async () => {
+    if (!jsonConfigURL) {
+      toast.error("Error", {
+        description: "Failed to generate the share URL.",
+      });
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(jsonConfigURL);
+
+        toast.success("Success", {
+          description: "Share URL copied to clipboard.",
+        });
+        return;
+      }
+
+      window.prompt(
+        "Copy this URL to share your configuration:",
+        jsonConfigURL,
+      );
+    } catch (error) {
+      console.error("Failed to share configuration URL:", error);
+      toast.error("Error", {
+        description: "Failed to copy share URL.",
+      });
+    }
+  }, [jsonConfigURL]);
+
   const onFileValidate = React.useCallback(
     (file: File): null | string => {
       if (files.length > 1) {
@@ -203,7 +235,7 @@ const ConfigurationTab: React.FC = () => {
         <CardHeader>
           <CardTitle>Export Configuration</CardTitle>
           <CardDescription>
-            Download your configuration as JSON.
+            Download your configuration as JSON or share it via URL.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -212,6 +244,10 @@ const ConfigurationTab: React.FC = () => {
               <Button onClick={onDownload} size="sm" variant="outline">
                 <DownloadIcon />
                 Download Configuration
+              </Button>
+              <Button onClick={onShare} size="sm" variant="outline">
+                <Share2Icon />
+                Copy Share URL
               </Button>
             </div>
           </div>

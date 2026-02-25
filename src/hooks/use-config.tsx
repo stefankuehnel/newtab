@@ -1,3 +1,4 @@
+import LZString from "lz-string";
 import React from "react";
 import { toast } from "sonner";
 import SuperJSON from "superjson";
@@ -89,4 +90,71 @@ export const useJSONConfig = () => {
   );
 
   return { jsonConfig, setJSONConfig };
+};
+
+export const useJSONConfigFromURL = () => {
+  const { jsonConfig, setJSONConfig } = useJSONConfig();
+  const configQueryParameter = "config";
+
+  const jsonConfigURL = React.useMemo(() => {
+    if (!jsonConfig) {
+      return "";
+    }
+
+    const compressedConfig = LZString.compressToEncodedURIComponent(jsonConfig);
+
+    if (!compressedConfig) {
+      return "";
+    }
+
+    const url = new URL(window.location.href);
+    url.searchParams.set(configQueryParameter, compressedConfig);
+
+    return url.toString();
+  }, [jsonConfig]);
+
+  const setJSONConfigFromURL = React.useCallback(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const compressedJSONConfig = searchParams.get(configQueryParameter);
+
+    if (!compressedJSONConfig) {
+      return false;
+    }
+
+    const jsonConfig =
+      LZString.decompressFromEncodedURIComponent(compressedJSONConfig);
+
+    if (!jsonConfig) {
+      toast.error("Import Failed", {
+        description: "The shared URL does not contain a valid configuration.",
+      });
+      return false;
+    }
+
+    const success = setJSONConfig(jsonConfig);
+
+    if (success) {
+      toast.success("Success", {
+        description: "Configuration imported from shared URL.",
+      });
+    }
+
+    return success;
+  }, [setJSONConfig]);
+
+  return { jsonConfigURL, setJSONConfigFromURL };
+};
+
+export const useJSONConfigFromURLOnMount = () => {
+  const { setJSONConfigFromURL } = useJSONConfigFromURL();
+
+  const [isJSONConfigSetFromURL, setIsJSONConfigSetFromURL] =
+    React.useState(false);
+
+  React.useEffect(() => {
+    if (!isJSONConfigSetFromURL) {
+      setIsJSONConfigSetFromURL(true);
+      setJSONConfigFromURL();
+    }
+  }, [isJSONConfigSetFromURL, setIsJSONConfigSetFromURL, setJSONConfigFromURL]);
 };

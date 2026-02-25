@@ -10,8 +10,11 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Toaster } from "@/components/ui/sonner";
+import { useJSONConfigFromURLOnMount } from "@/hooks/use-config";
 
 export const App: React.FC = () => {
+  useJSONConfigFromURLOnMount();
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="flex items-center justify-between p-4">
