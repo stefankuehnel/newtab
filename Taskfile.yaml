@@ -45,6 +45,23 @@ tasks:
     cmds:
       - pnpm run build
 
+  deploy:
+    desc: "Deploy project"
+    deps: 
+      - build
+    cmds:
+      - >-
+        rclone sync dist/ :ftp:/ \
+          --ftp-host=${FTP_HOST} \
+          --ftp-user=${FTP_USER} \
+          --ftp-pass=$(rclone obscure ${FTP_PASSWORD}) \
+          --ftp-explicit-tls=true
+    requires:
+      vars:
+        - FTP_HOST
+        - FTP_USER
+        - FTP_PASSWORD
+
   clean:
     desc: "Clean build artifacts"
     cmds:

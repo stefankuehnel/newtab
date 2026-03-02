@@ -33,6 +33,7 @@
         pkgs.nodejs
         pkgs.pnpm
         pkgs.go-task
+        pkgs.rclone
 
         pkgs.nixd # Nix Language Server
         pkgs.nixfmt # Nix Formatter

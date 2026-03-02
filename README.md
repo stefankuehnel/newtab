@@ -1,6 +1,6 @@
 # NewTab
 
-[![GitHub Pages](../../actions/workflows/github-pages.yaml/badge.svg)](../../actions/workflows/github-pages.yaml)
+[![CI](../../actions/workflows/ci.yaml/badge.svg)](../../actions/workflows/ci.yaml)
 
 A modern, customizable browser new tab page built by [Stefan Kühnel](https://stefankuehnel.com).
 
@@ -55,6 +55,9 @@ task install
 
 # Build the project
 task build
+
+# Deploy the project
+task deploy
 
 # Format code
 task format
