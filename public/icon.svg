@@ -1,0 +1,19 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <!-- White background rectangle with padding -->
+  <rect x="0" y="0" width="24" height="24" fill="white" />
+  <!-- Icon content with padding (2px inset) -->
+  <rect x="4" y="6" width="16" height="12" rx="2" />
+  <path d="M12 6v4" />
+  <path d="M4 10h16" />
+  <path d="M8 6v4" />
+</svg>

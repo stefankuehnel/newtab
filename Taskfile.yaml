@@ -1,0 +1,141 @@
+version: "3"
+
+dotenv: 
+  - ".env"
+
+tasks:
+  default:
+    desc: "Run default task"
+    cmds:
+      - task: "build"
+
+  init:
+    desc: "Initialize project"
+    cmds:
+      - task: "init:env"
+
+  init:env:
+    desc: "Initialize environment variables"
+    cmds:
+      - |
+        cat <<EOF > .env        
+        FTP_HOST="{{ .FTP_HOST }}"
+        FTP_USER="{{ .FTP_USER }}"
+        FTP_PASSWORD="{{ .FTP_PASSWORD }}"
+        EOF
+    requires:
+      vars:
+        - "FTP_HOST"
+        - "FTP_USER"
+        - "FTP_PASSWORD"
+
+  install:
+    desc: "Install dependencies"
+    sources:
+      - "package.json"
+      - "pnpm-lock.yaml"
+    cmds:
+      - "pnpm install"
+
+  dev:
+    desc: "Run development server"
+    deps:
+      - task: "install"
+    cmds:
+      - task: "vite:dev"
+
+  vite:dev:
+    desc: "Run development server with Vite"
+    deps:
+      - task: "install"
+    cmds:
+      - "pnpm run dev" 
+
+  build:
+    desc: "Build project"
+    deps:
+      - task: "install"
+    cmds:
+      - task: "vite:build"
+
+  vite:build:
+    desc: "Build project with Vite"
+    deps:
+      - task: "install"
+      - task: "clean"
+    cmds:
+      - "pnpm run build"
+
+  deploy:
+    desc: "Deploy project"
+    deps:
+      - task: "build"
+    cmds:
+      - task: "ftps:deploy"
+
+  ftps:deploy:
+    desc: "Deploy project with FTPS"
+    cmds:
+      - >-
+        rclone sync dist/ :ftp:/ \
+          --ftp-host=${FTP_HOST} \
+          --ftp-user=${FTP_USER} \
+          --ftp-pass=$(rclone obscure ${FTP_PASSWORD}) \
+          --ftp-explicit-tls=true
+    requires:
+      vars:
+        - "FTP_HOST"
+        - "FTP_USER"
+        - "FTP_PASSWORD"
+
+  format:
+    desc: "Format project"
+    deps:
+      - task: "prettier:format"
+      - task: "nix:format"
+
+  prettier:format:
+    desc: "Format project with Biome"
+    deps:
+      - task: "install"
+    cmds:
+      - "pnpm run format"
+
+  nix:format:
+    desc: "Format project with Nix"
+    cmds:
+      - "nix fmt"
+
+  lint:
+    desc: "Lint project"
+    deps:
+      - task: "eslint:lint"
+
+  eslint:lint:
+    desc: "Lint project with ESLint"
+    deps:
+      - task: "install"
+    cmds:
+      - "pnpm run lint"
+
+  lint:fix:
+    desc: "Lint and fix project"
+    deps:
+      - task: "eslint:lint:fix"
+
+  eslint:lint:fix:
+    desc: "Lint and fix project with ESLint"
+    deps:
+      - task: "install"
+    cmds:
+      - "pnpm run lint:fix"
+
+  clean:
+    desc: "Clean project artifacts"
+    cmds:
+      - task: "vite:clean"
+
+  vite:clean:
+    desc: "Clean 'dist/' directory"
+    cmds:
+      - "rm --recursive --force dist"
